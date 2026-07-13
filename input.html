@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ввод данных</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#eef1f7;color:#1a1a1a;font-size:13px}
+.topbar{background:#1F3864;color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.topbar h1{font-size:15px;font-weight:700}
+.btn{display:inline-block;padding:7px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;text-decoration:none}
+.btn-primary{background:#2E5FA3;color:#fff}
+.btn-sec{background:#fff;color:#1F3864;border:1px solid #1F3864}
+.page{max-width:960px;margin:0 auto;padding:20px 20px 80px}
+.sec{background:#fff;border-radius:10px;border:1px solid #dde3f0;margin-bottom:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.sh{background:#1F3864;color:#fff;padding:10px 16px;font-size:13px;font-weight:700}
+.sb{padding:16px}
+.fg{display:grid;gap:12px}
+.fg2{grid-template-columns:1fr 1fr}
+.fg3{grid-template-columns:1fr 1fr 1fr}
+.fg4{grid-template-columns:1fr 1fr 1fr 1fr}
+.f{display:flex;flex-direction:column;gap:4px}
+.f label{font-size:11px;font-weight:700;color:#444}
+.f input,.f select{border:1px solid #ccc;border-radius:6px;padding:7px 10px;font-size:13px;font-family:Arial;background:#f8fbff}
+.f input:focus,.f select:focus{outline:none;border-color:#2E5FA3;background:#fff}
+.f .hint{font-size:10px;color:#888}
+.st{font-size:11px;font-weight:700;color:#2E5FA3;text-transform:uppercase;letter-spacing:.05em;margin:12px 0 6px;border-bottom:1px solid #e0e8f5;padding-bottom:4px}
+.sr{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid #f0f0f0}
+.sr:last-child{border-bottom:none}
+.sr-lbl{font-size:12px;font-weight:700;color:#333}
+.sr input{border:1px solid #ccc;border-radius:6px;padding:6px 8px;font-size:12px;font-family:Arial}
+.bottom{position:sticky;bottom:0;background:#fff;border-top:2px solid #1F3864;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 -2px 8px rgba(0,0,0,.1)}
+@media(max-width:700px){.fg2,.fg3,.fg4{grid-template-columns:1fr}.sr{grid-template-columns:1fr 1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="topbar"><h1>Ввод данных — {{ d.date }}</h1><a href="/" class="btn btn-sec">&#8592; Дашборд</a></div>
+<div class="page">
+<form method="POST" action="/input">
+
+<div class="sec"><div class="sh">Общие сведения</div><div class="sb">
+  <div class="fg fg3">
+    <div class="f"><label>Дата отчёта</label><input type="date" name="date" value="{{ d.date }}" required></div>
+    <div class="f"><label>Обновил (ФИО)</label><input type="text" name="updated_by" value="{{ d.updated_by }}" placeholder="Иванов И.И."></div>
+    <div class="f"><label>Норма суточного расхода (т)</label><input type="number" name="consumption_norm" value="{{ d.consumption_norm }}" step="0.1"><span class="hint">Не менять без решения группы</span></div>
+  </div>
+</div></div>
+
+<div class="sec"><div class="sh">1. Запасы и поступления</div><div class="sb">
+  <div class="st">Остатки на нефтебазах (т)</div>
+  <div class="fg fg3">
+    <div class="f"><label>Нефтебаза 1</label><input type="number" name="stock_central" value="{{ d.stock_central }}" step="0.1"></div>
+    <div class="f"><label>Нефтебаза 2</label><input type="number" name="stock_east" value="{{ d.stock_east }}" step="0.1"></div>
+    <div class="f"><label>Нефтебаза 3</label><input type="number" name="stock_south" value="{{ d.stock_south }}" step="0.1"></div>
+  </div>
+  <div class="f" style="margin-top:10px"><label>Общий остаток (итого), т</label><input type="number" name="stock_total" value="{{ d.stock_total }}" step="0.1"></div>
+  <div class="st">Поступление за сутки (т)</div>
+  <div class="fg fg4">
+    <div class="f"><label>Всего поступило</label><input type="number" name="supply_day" value="{{ d.supply_day }}" step="0.1"></div>
+    <div class="f"><label>Источник 1</label><input type="number" name="supply_npz" value="{{ d.supply_npz }}" step="0.1"></div>
+    <div class="f"><label>Источник 2 (ж/д)</label><input type="number" name="supply_rail" value="{{ d.supply_rail }}" step="0.1"></div>
+    <div class="f"><label>Автоцистерны</label><input type="number" name="supply_truck" value="{{ d.supply_truck }}" step="0.1"></div>
+  </div>
+  <div class="st">Топливо в пути</div>
+  <div class="fg fg2">
+    <div class="f"><label>Объём в пути (т)</label><input type="number" name="fuel_in_transit" value="{{ d.fuel_in_transit }}" step="0.1"></div>
+    <div class="f"><label>Ожидаемое прибытие</label><input type="text" name="transit_eta" value="{{ d.transit_eta }}" placeholder="напр. 30.06"></div>
+  </div>
+  <div class="st">Расход</div>
+  <div class="fg fg2">
+    <div class="f"><label>Суточный расход (факт), т</label><input type="number" name="consumption_day" value="{{ d.consumption_day }}" step="0.1"></div>
+  </div>
+</div></div>
+
+<div class="sec"><div class="sh">2. Логистика</div><div class="sb">
+  <div class="st">Парк бензовозов</div>
+  <div class="fg fg2">
+    <div class="f"><label>В работе (шт.)</label><input type="number" name="trucks_active" value="{{ d.trucks_active }}"></div>
+    <div class="f"><label>На ремонте (шт.)</label><input type="number" name="trucks_repair" value="{{ d.trucks_repair }}"></div>
+  </div>
+  <div class="st">Маршруты</div>
+  <div class="fg fg3" style="margin-bottom:8px">
+    <div class="f"><label>Маршрут 1 — название</label><input type="text" name="route1_name" value="{{ d.route1_name }}"></div>
+    <div class="f"><label>Бензовозов/сут</label><input type="number" name="route1_vol" value="{{ d.route1_vol }}"></div>
+    <div class="f"><label>Уровень угрозы</label>
+      <select name="route1_risk">
+        <option value="0" {% if d.route1_risk=="0" %}selected{% endif %}>Безопасен</option>
+        <option value="1" {% if d.route1_risk=="1" %}selected{% endif %}>Повышенный риск</option>
+        <option value="2" {% if d.route1_risk=="2" %}selected{% endif %}>Опасен</option>
+      </select></div>
+  </div>
+  <div class="fg fg3">
+    <div class="f"><label>Маршрут 2 — название</label><input type="text" name="route2_name" value="{{ d.route2_name }}"></div>
+    <div class="f"><label>Бензовозов/сут</label><input type="number" name="route2_vol" value="{{ d.route2_vol }}"></div>
+    <div class="f"><label>Уровень угрозы</label>
+      <select name="route2_risk">
+        <option value="0" {% if d.route2_risk=="0" %}selected{% endif %}>Безопасен</option>
+        <option value="1" {% if d.route2_risk=="1" %}selected{% endif %}>Повышенный риск</option>
+        <option value="2" {% if d.route2_risk=="2" %}selected{% endif %}>Опасен</option>
+      </select></div>
+  </div>
+  <div class="st">АЗС</div>
+  <div class="fg fg4">
+    <div class="f"><label>АЗС работают (шт.)</label><input type="number" name="azs_ok" value="{{ d.azs_ok }}"></div>
+    <div class="f"><label>АЗС с лимитом (шт.)</label><input type="number" name="azs_limit" value="{{ d.azs_limit }}"></div>
+    <div class="f"><label>АЗС без топлива (шт.)</label><input type="number" name="azs_empty" value="{{ d.azs_empty }}"></div>
+    <div class="f"><label>Очереди на АЗС</label>
+      <select name="queues"><option value="0" {% if d.queues=="0" %}selected{% endif %}>Нет</option><option value="1" {% if d.queues=="1" %}selected{% endif %}>Да</option></select></div>
+  </div>
+  <div class="fg fg2" style="margin-top:10px">
+    <div class="f"><label>Сухая зона (описание)</label><input type="text" name="dry_zone" value="{{ d.dry_zone }}" placeholder="напр. Шахтёрский р-н — 45 км без АЗС"></div>
+    <div class="f"><label>ЖД сообщение</label>
+      <select name="rail_level">
+        <option value="0" {% if d.rail_level=="0" %}selected{% endif %}>Не задействовано</option>
+        <option value="1" {% if d.rail_level=="1" %}selected{% endif %}>Частичная</option>
+        <option value="2" {% if d.rail_level=="2" %}selected{% endif %}>Полная</option>
+      </select></div>
+  </div>
+</div></div>
+
+<div class="sec"><div class="sh">3. Приоритетные потребители</div><div class="sb">
+  <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;margin-bottom:8px">
+    <div style="font-size:11px;font-weight:700;color:#888">Служба</div>
+    <div style="font-size:11px;font-weight:700;color:#888">Факт (т/сут)</div>
+    <div style="font-size:11px;font-weight:700;color:#888">Норма (т/сут)</div>
+  </div>
+  {% for key, label in [("ambulance","Скорая помощь"),("fire","Пожарная охрана"),("police","Полиция / МВД"),
+      ("school","Школьные маршруты"),("hospital","Больницы"),
+      ("generator","Рез. генераторы"),("water","Водоснабжение"),
+      ("heat","Теплоснабжение"),("food","Прод. логистика")] %}
+  <div class="sr">
+    <div class="sr-lbl">{{ label }}</div>
+    <input type="number" name="soc_{{ key }}_fact" value="{{ d['soc_'~key~'_fact'] }}" step="0.1" placeholder="т/сут">
+    <input type="number" name="soc_{{ key }}_norm" value="{{ d['soc_'~key~'_norm'] }}" step="0.1" style="background:#f0f7f0">
+  </div>
+  {% endfor %}
+</div></div>
+
+<div class="sec"><div class="sh">4. Экономика</div><div class="sb">
+  <div class="fg fg4">
+    <div class="f"><label>АИ-92 средняя (руб/л)</label><input type="number" name="price_92" value="{{ d.price_92 }}" step="0.01"></div>
+    <div class="f"><label>АИ-92 мин.</label><input type="number" name="price_92_min" value="{{ d.price_92_min }}" step="0.01"></div>
+    <div class="f"><label>АИ-92 макс.</label><input type="number" name="price_92_max" value="{{ d.price_92_max }}" step="0.01"></div>
+    <div class="f"><label>АИ-95 средняя (руб/л)</label><input type="number" name="price_95" value="{{ d.price_95 }}" step="0.01"></div>
+  </div>
+  <div class="fg fg4" style="margin-top:10px">
+    <div class="f"><label>ДТ средняя (руб/л)</label><input type="number" name="price_dt" value="{{ d.price_dt }}" step="0.01"></div>
+    <div class="f"><label>Закупочная (опт)</label><input type="number" name="price_wholesale" value="{{ d.price_wholesale }}" step="0.01"><span class="hint">Спред = авто</span></div>
+    <div class="f"><label>Цена перекупов</label><input type="number" name="price_shadow" value="{{ d.price_shadow }}" step="0.01"></div>
+    <div class="f"><label>Средняя по стране</label><input type="number" name="price_national" value="{{ d.price_national }}" step="0.01"></div>
+  </div>
+</div></div>
+
+<div class="sec"><div class="sh">5. Соцмониторинг (ЦУР)</div><div class="sb">
+  <div class="fg fg4">
+    <div class="f"><label>Упоминаний темы</label><input type="number" name="social_mentions" value="{{ d.social_mentions }}"></div>
+    <div class="f"><label>Жалоб на очереди</label><input type="number" name="social_queues_cnt" value="{{ d.social_queues_cnt }}"></div>
+    <div class="f"><label>Сообщ. о пустых АЗС</label><input type="number" name="social_empty_cnt" value="{{ d.social_empty_cnt }}"></div>
+    <div class="f"><label>Жалоб на цены</label><input type="number" name="social_prices_cnt" value="{{ d.social_prices_cnt }}"></div>
+  </div>
+  <div class="fg fg2" style="margin-top:10px">
+    <div class="f"><label>Перекупщики активны</label>
+      <select name="social_resellers"><option value="0" {% if d.social_resellers=="0" %}selected{% endif %}>Нет</option><option value="1" {% if d.social_resellers=="1" %}selected{% endif %}>Да</option></select></div>
+    <div class="f"><label>Вывод ЦУР</label><input type="text" name="social_note" value="{{ d.social_note }}" placeholder="Краткое описание..."></div>
+  </div>
+</div></div>
+
+<div class="bottom">
+  <a href="/" class="btn btn-sec">&#8592; Отмена</a>
+  <button type="submit" class="btn btn-primary" style="font-size:14px;padding:10px 28px">Сохранить данные</button>
+</div>
+</form>
+</div>
+</body></html>

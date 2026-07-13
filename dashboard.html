@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Дашборд — Управление бензином</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#eef1f7;color:#1a1a1a;font-size:13px}
+a{color:inherit;text-decoration:none}
+.topbar{background:#1F3864;color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.topbar h1{font-size:15px;font-weight:700}
+.topbar .meta{font-size:11px;color:#aac;margin-top:2px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.btn{display:inline-block;padding:7px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;text-decoration:none}
+.btn-primary{background:#2E5FA3;color:#fff}
+.btn-sec{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3)}
+.badge-status{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-red{background:#ffc7ce;color:#9C0006}
+.badge-amb{background:#ffeb9c;color:#7B5A00}
+.badge-grn{background:#c6efce;color:#276221}
+.archive-bar{background:#7B5A00;color:#fff;padding:8px 20px;font-size:12px;display:flex;justify-content:space-between;align-items:center}
+.page{max-width:1300px;margin:0 auto;padding:16px}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.kpi{background:#fff;border-radius:10px;padding:14px 16px;border:1px solid #dde3f0;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.kpi .lbl{font-size:11px;color:#666;margin-bottom:4px}
+.kpi .val{font-size:24px;font-weight:700;color:#1F3864;line-height:1}
+.kpi .sub{font-size:11px;margin-top:4px}
+.txt-red{color:#9C0006}.txt-amb{color:#7B5A00}.txt-grn{color:#276221}.txt-blu{color:#1F4E79}
+.alert-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.alert-box{border-radius:10px;padding:12px 14px}
+.alert-red{background:#FFC7CE;border:1px solid #e8aaaa}
+.alert-amb{background:#FFEB9C;border:1px solid #d4b800}
+.alert-box h3{font-size:12px;font-weight:700;margin-bottom:6px}
+.alert-red h3{color:#9C0006}.alert-amb h3{color:#7B5A00}
+.alert-box li{font-size:11.5px;padding:2px 0;list-style:none;display:flex;gap:5px}
+.alert-red li{color:#7B0005}.alert-amb li{color:#5a3d00}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.card{background:#fff;border-radius:10px;padding:14px;border:1px solid #dde3f0;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card h3{font-size:12px;font-weight:700;color:#1F3864;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #1F3864}
+.sec-title{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin:8px 0 5px}
+.bar-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.bar-label{width:145px;font-size:11px;color:#444;flex-shrink:0}
+.bar-track{flex:1;height:8px;background:#e8e8e8;border-radius:4px;position:relative;overflow:hidden}
+.bar-fill{height:8px;border-radius:4px;position:absolute;left:0;top:0}
+.bar-val{width:38px;text-align:right;font-size:11px;font-weight:700;flex-shrink:0}
+.pill{display:inline-block;padding:2px 10px;border-radius:12px;font-size:10px;font-weight:700}
+.pill-red{background:#ffc7ce;color:#9C0006}
+.pill-amb{background:#ffeb9c;color:#7B5A00}
+.pill-grn{background:#c6efce;color:#276221}
+.tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.tbl th{background:#1F3864;color:#fff;padding:6px 8px;text-align:left;font-weight:600}
+.tbl td{padding:5px 8px;border-bottom:1px solid #eee;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#f5f8ff}
+.truck-boxes{display:flex;gap:8px;margin-bottom:10px}
+.truck-box{flex:1;border-radius:8px;padding:8px;text-align:center}
+.truck-box .tv{font-size:20px;font-weight:700}
+.truck-box .tl{font-size:10px;margin-top:2px}
+.tb-grn{background:#c6efce}.tb-grn .tv,.tb-grn .tl{color:#276221}
+.tb-red{background:#ffc7ce}.tb-red .tv,.tb-red .tl{color:#9C0006}
+.tb-gry{background:#f2f2f2}.tb-gry .tv,.tb-gry .tl{color:#444}
+.ri{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:11.5px}
+.ri:last-child{border-bottom:none}
+.ri-k{color:#555}.ri-v{font-weight:700;text-align:right}
+.log-form{background:#f8f9fc;border-radius:8px;padding:12px;margin-top:10px;border:1px solid #dde3f0}
+.log-form input,.log-form select{border:1px solid #ccc;border-radius:5px;padding:5px 8px;font-size:12px;font-family:Arial}
+.dry-alert{background:#ffc7ce;border-radius:6px;padding:6px 10px;font-size:11px;color:#9C0006;font-weight:700;margin-top:6px}
+.forecast-box{background:#f0f4ff;border-radius:8px;padding:10px;margin-top:8px}
+.footer{text-align:center;font-size:11px;color:#888;margin-top:20px;padding:10px}
+form.inline{display:inline}
+@media(max-width:900px){.kpi-row{grid-template-columns:1fr 1fr}.row2,.alert-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div>
+    <h1>&#9981; Оперативный дашборд — Управление бензином</h1>
+    <div class="meta">Дата: <b>{{ d.date }}</b>{% if d.updated_by %} · Обновил: <b>{{ d.updated_by }}</b>{% endif %}</div>
+  </div>
+  <div class="topbar-right">
+    {% set aut = d.autonomy %}
+    {% if aut is not none %}
+      {% if aut < 3 %}<span class="badge-status badge-red">&#9888; Критично ({{ aut }} дн.)</span>
+      {% elif aut < 6 %}<span class="badge-status badge-amb">&#9888; Дефицит ({{ aut }} дн.)</span>
+      {% else %}<span class="badge-status badge-grn">&#10003; Норма ({{ aut }} дн.)</span>{% endif %}
+    {% else %}<span class="badge-status badge-amb">Нет данных</span>{% endif %}
+    <a href="/history" class="btn btn-sec">История</a>
+    <a href="/input" class="btn btn-primary">&#9998; Ввод данных</a>
+  </div>
+</div>
+
+{% if archive_date is defined %}
+<div class="archive-bar">
+  <span>Архивные данные за {{ archive_date }}</span>
+  <a href="/" style="color:#fff;font-weight:700">&#8592; Вернуться к сегодняшним данным</a>
+</div>
+{% endif %}
+
+<div class="page">
+
+<div class="kpi-row">
+  <div class="kpi">
+    <div class="lbl">Остаток на нефтебазах</div>
+    <div class="val">{{ d.stock_total or '—' }} <span style="font-size:14px">т</span></div>
+    {% if d.autonomy is not none %}
+    <div class="sub {% if d.autonomy<3 %}txt-red{% elif d.autonomy<6 %}txt-amb{% else %}txt-grn{% endif %}">&#8776; {{ d.autonomy }} дней автономности</div>
+    {% endif %}
+  </div>
+  <div class="kpi">
+    <div class="lbl">Поступило за сутки</div>
+    <div class="val">{{ d.supply_day or '—' }} <span style="font-size:14px">т</span></div>
+    {% if d.supply_day and d.consumption_norm %}
+      {% set sp = (d.supply_day|float / d.consumption_norm|float * 100)|round|int %}
+      <div class="sub {% if sp<70 %}txt-red{% elif sp<90 %}txt-amb{% else %}txt-grn{% endif %}">{{ sp }}% от нормы ({{ d.consumption_norm }} т)</div>
+    {% endif %}
+  </div>
+  <div class="kpi">
+    <div class="lbl">Топливо в пути</div>
+    <div class="val">{{ d.fuel_in_transit or '—' }} <span style="font-size:14px">т</span></div>
+    {% if d.transit_eta %}<div class="sub txt-blu">прибытие: {{ d.transit_eta }}</div>{% endif %}
+  </div>
+  <div class="kpi">
+    <div class="lbl">Суточный расход (факт)</div>
+    <div class="val">{{ d.consumption_day or '—' }} <span style="font-size:14px">т</span></div>
+    {% if d.consumption_norm %}<div class="sub txt-amb">норма {{ d.consumption_norm }} т/сут</div>{% endif %}
+  </div>
+</div>
+
+{% set red_alerts = [] %}
+{% set amb_alerts = [] %}
+{% if d.autonomy is not none %}{% if d.autonomy<3 %}{% set _=red_alerts.append("Дней автономности менее 3 — критический уровень") %}{% elif d.autonomy<6 %}{% set _=amb_alerts.append("Дней автономности: "~d.autonomy~" — ниже нормы") %}{% endif %}{% endif %}
+{% for item in d.soc_items %}{% if item.pct is not none %}{% if item.pct<60 %}{% set _=red_alerts.append(item.label~": покрытие "~item.pct~"%") %}{% elif item.pct<80 %}{% set _=amb_alerts.append(item.label~": покрытие "~item.pct~"%") %}{% endif %}{% endif %}{% endfor %}
+{% if d.spread is not none and d.spread<0 %}{% set _=red_alerts.append("Спред опт/розница отрицательный ("~d.spread~" руб/л)") %}{% endif %}
+{% if d.dry_zone %}{% set _=red_alerts.append("Сухая зона: "~d.dry_zone) %}{% endif %}
+{% if d.route1_risk=="2" %}{% set _=red_alerts.append("Маршрут "~d.route1_name~" — ОПАСЕН") %}{% elif d.route1_risk=="1" %}{% set _=amb_alerts.append("Маршрут "~d.route1_name~" — повышенный риск") %}{% endif %}
+{% if d.route2_risk=="2" %}{% set _=red_alerts.append("Маршрут "~d.route2_name~" — ОПАСЕН") %}{% elif d.route2_risk=="1" %}{% set _=amb_alerts.append("Маршрут "~d.route2_name~" — повышенный риск") %}{% endif %}
+
+{% if red_alerts or amb_alerts %}
+<div class="alert-row">
+  {% if red_alerts %}<div class="alert-box alert-red"><h3>Критические сигналы</h3><ul>{% for a in red_alerts %}<li><span>&#8250;</span>{{ a }}</li>{% endfor %}</ul></div>{% endif %}
+  {% if amb_alerts %}<div class="alert-box alert-amb"><h3>Предупреждения</h3><ul>{% for a in amb_alerts %}<li><span>&#8250;</span>{{ a }}</li>{% endfor %}</ul></div>{% endif %}
+</div>
+{% endif %}
+
+<div class="row2">
+  <div class="card">
+    <h3>Поступление и запасы</h3>
+    <div class="sec-title">Нефтебазы — остатки</div>
+    <div class="ri"><span class="ri-k">«Центральная»</span><span class="ri-v">{{ d.stock_central or '—' }} т</span></div>
+    <div class="ri"><span class="ri-k">«Восточная»</span><span class="ri-v">{{ d.stock_east or '—' }} т</span></div>
+    <div class="ri"><span class="ri-k">«Южная»</span><span class="ri-v">{{ d.stock_south or '—' }} т</span></div>
+    <div class="sec-title">Источники поступления за сутки</div>
+    <div class="ri"><span class="ri-k">НПЗ «Север»</span><span class="ri-v">{{ d.supply_npz or '—' }} т</span></div>
+    <div class="ri"><span class="ri-k">Импорт (ж/д)</span><span class="ri-v">{{ d.supply_rail or '—' }} т</span></div>
+    <div class="ri"><span class="ri-k">Автоцистерны</span><span class="ri-v">{{ d.supply_truck or '—' }} т</span></div>
+    <div class="sec-title">Топливо в пути</div>
+    <div class="ri"><span class="ri-k">Объём законтрактован</span><span class="ri-v txt-blu">{{ d.fuel_in_transit or '—' }} т</span></div>
+    <div class="ri"><span class="ri-k">Ожидаемое прибытие</span><span class="ri-v">{{ d.transit_eta or '—' }}</span></div>
+  </div>
+  <div class="card">
+    <h3>Логистика и инфраструктура</h3>
+    <div class="sec-title">Парк бензовозов</div>
+    <div class="truck-boxes">
+      <div class="truck-box tb-grn"><div class="tv">{{ d.trucks_active or '—' }}</div><div class="tl">В работе</div></div>
+      <div class="truck-box tb-red"><div class="tv">{{ d.trucks_repair or '—' }}</div><div class="tl">На ремонте</div></div>
+      <div class="truck-box tb-gry"><div class="tv">{{ d.trucks_total_calc }}</div><div class="tl">Всего</div></div>
+    </div>
+    <div class="sec-title">Маршруты</div>
+    {% for rname,rvol,rrisk,rlabel in [(d.route1_name,d.route1_vol,d.route1_risk,d.route1_risk_label),(d.route2_name,d.route2_vol,d.route2_risk,d.route2_risk_label)] %}
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0">
+      <div><div style="font-size:11.5px;font-weight:700">{{ rname }}</div>
+      <div style="font-size:11px;color:#666">{{ rvol or '—' }} бензовозов/сут</div></div>
+      <span class="pill {% if rrisk=='2' %}pill-red{% elif rrisk=='1' %}pill-amb{% else %}pill-grn{% endif %}">{{ rlabel }}</span>
+    </div>{% endfor %}
+    <div class="sec-title">АЗС и инфраструктура</div>
+    <div class="ri"><span class="ri-k">ЖД сообщение</span><span class="ri-v">{{ d.rail_label }}</span></div>
+    <div class="ri"><span class="ri-k">АЗС работают</span><span class="ri-v txt-grn">{{ d.azs_ok or '—' }} шт.</span></div>
+    <div class="ri"><span class="ri-k">АЗС с лимитом</span><span class="ri-v txt-amb">{{ d.azs_limit or '—' }} шт.</span></div>
+    <div class="ri"><span class="ri-k">АЗС без топлива</span><span class="ri-v txt-red">{{ d.azs_empty or '—' }} шт.</span></div>
+    <div class="ri"><span class="ri-k">Очереди на АЗС</span>
+      <span class="ri-v {% if d.queues=='1' %}txt-amb{% else %}txt-grn{% endif %}">{% if d.queues=='1' %}Да{% else %}Нет{% endif %}</span>
+    </div>
+    {% if d.dry_zone %}<div class="dry-alert">Сухая зона: {{ d.dry_zone }}</div>{% endif %}
+  </div>
+</div>
+
+<div class="row2">
+  <div class="card">
+    <h3>Приоритетные службы — покрытие нормы</h3>
+    {% for item in d.soc_items %}{% set p = item.pct %}
+    <div class="bar-row">
+      <div class="bar-label">{{ item.label }}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:{% if p is not none %}{{ [p,100]|min }}{% else %}0{% endif %}%;background:{% if p is none %}#ccc{% elif p<60 %}#CC2222{% elif p<80 %}#CC8800{% else %}#276221{% endif %}"></div></div>
+      <div class="bar-val {% if p is not none %}{% if p<60 %}txt-red{% elif p<80 %}txt-amb{% else %}txt-grn{% endif %}{% endif %}">{% if p is not none %}{{ p }}%{% else %}—{% endif %}</div>
+    </div>{% endfor %}
+  </div>
+  <div class="card">
+    <h3>Экономические показатели</h3>
+    <div class="sec-title">Розничные цены</div>
+    <div class="ri"><span class="ri-k">АИ-92 (средняя)</span><span class="ri-v">{{ d.price_92 or '—' }} руб/л</span></div>
+    {% if d.price_92_min or d.price_92_max %}<div class="ri"><span class="ri-k">АИ-92 (мин / макс)</span><span class="ri-v">{{ d.price_92_min or '?' }} / {{ d.price_92_max or '?' }} руб/л</span></div>{% endif %}
+    <div class="ri"><span class="ri-k">АИ-95 (средняя)</span><span class="ri-v">{{ d.price_95 or '—' }} руб/л</span></div>
+    {% if d.price_dt %}<div class="ri"><span class="ri-k">ДТ (средняя)</span><span class="ri-v">{{ d.price_dt }} руб/л</span></div>{% endif %}
+    <div class="sec-title">Ориентиры</div>
+    <div class="ri"><span class="ri-k">Закупочная (опт)</span><span class="ri-v">{{ d.price_wholesale or '—' }} руб/л</span></div>
+    {% if d.spread is not none %}<div class="ri"><span class="ri-k">Спред опт/розница</span>
+      <span class="ri-v {% if d.spread<0 %}txt-red{% elif d.spread<3 %}txt-amb{% else %}txt-grn{% endif %}">{{ d.spread }} руб/л {% if d.spread<0 %}(!){% endif %}</span></div>{% endif %}
+    {% if d.price_shadow %}<div class="ri"><span class="ri-k">Цена перекупов</span><span class="ri-v txt-red">{{ d.price_shadow }} руб/л</span></div>{% endif %}
+    {% if d.price_national %}<div class="ri"><span class="ri-k">Средняя по стране</span><span class="ri-v">{{ d.price_national }} руб/л</span></div>{% endif %}
+    <div class="sec-title">Прогноз запаса</div>
+    <div class="forecast-box">
+      <div style="font-size:20px;font-weight:700" class="{% if d.autonomy is not none %}{% if d.autonomy<3 %}txt-red{% elif d.autonomy<6 %}txt-amb{% else %}txt-grn{% endif %}{% endif %}">
+        {% if d.autonomy is not none %}&#8776; {{ d.autonomy }} дней{% else %}нет данных{% endif %}</div>
+      <div style="font-size:11px;color:#555;margin-top:4px">при текущем суточном расходе</div>
+    </div>
+  </div>
+</div>
+
+{% if d.social_mentions or d.social_queues_cnt or d.social_note %}
+<div class="card" style="margin-bottom:12px">
+  <h3>Социальный мониторинг (ЦУР)</h3>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    {% for val,lbl,cls in [(d.social_mentions,"упоминаний темы","txt-red"),(d.social_queues_cnt,"жалоб на очереди","txt-red"),(d.social_empty_cnt,"сообщ. о пустых АЗС","txt-red"),(d.social_prices_cnt,"жалоб на цены","txt-amb")] %}
+    {% if val %}<div style="background:{% if cls=='txt-red' %}#fff0f0{% else %}#fffbe6{% endif %};border-radius:8px;padding:8px 14px;text-align:center">
+      <div style="font-size:20px;font-weight:700" class="{{ cls }}">{{ val }}</div>
+      <div style="font-size:10px" class="{{ cls }}">{{ lbl }}</div></div>{% endif %}{% endfor %}
+    {% if d.social_resellers=="1" %}<div style="background:#fffbe6;border-radius:8px;padding:8px 14px;text-align:center">
+      <div style="font-size:20px;font-weight:700;color:#7B5A00">(!)</div>
+      <div style="font-size:10px;color:#7B5A00">Перекупщики активны</div></div>{% endif %}
+    {% if d.social_note %}<div style="flex:1;min-width:200px;background:#f5f8ff;border-radius:8px;padding:10px 14px;font-size:12px;color:#333"><b>Вывод ЦУР:</b> {{ d.social_note }}</div>{% endif %}
+  </div>
+</div>{% endif %}
+
+<div class="card" id="log">
+  <h3>Журнал решений рабочей группы</h3>
+  {% if d.log %}
+  <table class="tbl" style="margin-bottom:12px">
+    <thead><tr><th style="width:52px">Дата</th><th>Решение / меры</th><th style="width:120px">Ответственный</th><th style="width:110px">Статус</th></tr></thead>
+    <tbody>
+    {% for entry in d.log %}
+    <tr>
+      <td style="color:#888">{{ entry.entry_date }}</td>
+      <td>{{ entry.action }}</td>
+      <td style="color:#555;font-size:11px">{{ entry.responsible }}</td>
+      <td>
+        <form method="POST" action="/log/status" class="inline">
+          <input type="hidden" name="id" value="{{ entry.id }}">
+          <select name="status" onchange="this.form.submit()" style="font-size:11px;border:1px solid #ccc;border-radius:4px;padding:2px 4px">
+            {% for st in ["В работе","Исполнено","Отменено","Перенесено"] %}<option {% if entry.status==st %}selected{% endif %}>{{ st }}</option>{% endfor %}
+          </select>
+        </form>
+      </td>
+    </tr>{% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p style="color:#888;font-size:12px;margin-bottom:10px">Записей пока нет.</p>{% endif %}
+  <div class="log-form">
+    <b style="font-size:12px;display:block;margin-bottom:8px">+ Добавить решение</b>
+    <form method="POST" action="/log/add">
+      <div style="display:grid;grid-template-columns:115px 1fr 140px 115px 80px;gap:6px;align-items:center">
+        <input type="date" name="log_date" value="{{ d.date }}">
+        <input type="text" name="log_action" placeholder="Описание решения / меры" required style="width:100%">
+        <input type="text" name="log_responsible" placeholder="Ответственный">
+        <select name="log_status" style="font-size:12px;border:1px solid #ccc;border-radius:5px;padding:5px 8px">
+          <option>В работе</option><option>Исполнено</option><option>Перенесено</option>
+        </select>
+        <button type="submit" class="btn btn-primary" style="padding:6px 10px;font-size:12px">Добавить</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="footer">Обновление каждые 60 сек · <a href="/history" style="color:#2E5FA3;font-weight:700">История</a> · <a href="/input" style="color:#2E5FA3;font-weight:700">Ввод данных</a></div>
+</div>
+{% if archive_date is not defined %}<script>setTimeout(()=>location.reload(),60000);</script>{% endif %}
+</body></html>

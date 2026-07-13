@@ -1,0 +1,14 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><title>История</title>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;background:#eef1f7;font-size:13px}
+.topbar{background:#1F3864;color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.topbar h1{font-size:15px;font-weight:700}.btn{display:inline-block;padding:7px 16px;border-radius:6px;font-size:12px;font-weight:700;text-decoration:none;border:1px solid rgba(255,255,255,.3);color:#fff}
+.page{max-width:600px;margin:30px auto;padding:0 16px}.card{background:#fff;border-radius:10px;border:1px solid #dde3f0;overflow:hidden}
+.card h3{background:#1F3864;color:#fff;padding:10px 16px;font-size:13px;font-weight:700}
+.di{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid #f0f0f0;font-size:13px}
+.di:last-child{border-bottom:none}.di:hover{background:#f5f8ff}.di a{color:#2E5FA3;font-weight:700;text-decoration:none}
+.empty{padding:20px;text-align:center;color:#888}</style></head>
+<body><div class="topbar"><h1>История данных</h1><a href="/" class="btn">&#8592; Дашборд</a></div>
+<div class="page"><div class="card"><h3>Архив по датам</h3>
+{% if dates %}{% for date in dates %}<div class="di"><span>{{ date }}</span><a href="/history/{{ date }}">Открыть &#8594;</a></div>{% endfor %}
+{% else %}<div class="empty">Данных пока нет.</div>{% endif %}
+</div></div></body></html>
