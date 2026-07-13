@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 import json, os, sqlite3, datetime
 
 app = Flask(__name__)
+from jinja2 import Environment
+app.jinja_env.globals['enumerate'] = enumerate
 DB_FILE = os.path.join(os.path.dirname(__file__), "fuel.db")
 
 # ── Schema ─────────────────────────────────────────────────────────────────
